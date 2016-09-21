@@ -118,7 +118,6 @@ SET startMenuLabels["enter"]		TO "Run Prog.".
 mainInit().
 UNTIL exit {
 	IF testDraw {
-		PRINT CHAR(7).
 		mainInit().
 		//startMenu["draw"]().
 		//PRINT CHAR(7).
