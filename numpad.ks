@@ -39,11 +39,10 @@
 //|             0:          .:          E:           |34
 //|--------------<This line off limits>--------------|35
 //</TERMPREVIEW>
-RUNONCEPATH("lib/lib_numpad.ks").
-RUNONCEPATH("lib/lib_scrollList.ks").
+FUNCTION bel {PRINT CHAR(7).}
+RUNONCEPATH("lib/lib_numpad").
+RUNONCEPATH("lib/lib_scrollList").
 GLOBAL exit IS FALSE.
-GLOBAL runprog IS FALSE.
-GLOBAL testDraw IS FALSE.
 LOCAL divider IS "".
 LOCAL termMaxY IS TERMINAL:HEIGHT - 8.
 LOCAL startMenu IS makeScrollList(4,4,TERMINAL:WIDTH - 4,termMaxY - 5,TRUE).
@@ -94,13 +93,8 @@ LOCAL FUNCTION mainInit {
 	PRINT "Select Program" AT (4,3).
 	startMenu["draw"]().
 	drawLabels().
-	PRINT CHAR(7).
 }
 
-SET startMenuAct[7]				TO {SET testDraw TO TRUE.}.
-SET startMenuLabels[7]			TO "Inline".
-SET startMenuAct[4]				TO mainInit@.
-SET startMenuLabels[4]			TO "Trigger".
 SET startMenuAct[8]				TO startMenu["cursorUp"].
 SET startMenuLabels[8]			TO "CursorUp".
 SET startMenuAct[2]				TO startMenu["cursorDn"].
@@ -109,27 +103,17 @@ SET startMenuAct["minus"]		TO startMenu["pageUp"].
 SET startMenuLabels["minus"]	TO "Page Up".
 SET startMenuAct["plus"]		TO startMenu["pageDn"].
 SET startMenuLabels["plus"]		TO "PageDn".
-SET startMenuAct["star"]		TO {SET exit TO TRUE.}.
+SET startMenuAct["star"]		TO {exit ON.}.
 SET startMenuLabels["star"]		TO "Exit2Term".
-SET startMenuAct["enter"]		TO {SET runprog TO TRUE.}.
-SET startMenuLabels["enter"]		TO "Run Prog.".
+SET startMenuAct["enter"]		TO {
+	RUNPATH("/menuProg/"+startMenu["content"][startMenu["getIndex"]()]).
+	mainInit().
+}.
+SET startMenuLabels["enter"]	TO "Run Prog.".
 
 
 mainInit().
 UNTIL exit {
-	IF testDraw {
-		mainInit().
-		//startMenu["draw"]().
-		//PRINT CHAR(7).
-		//drawLabels().
-		//PRINT CHAR(7).
-		SET testDraw TO FALSE.
-	}
-	IF runprog {
-		SET runprog TO FALSE.
-		RUNPATH("/menuProg/"+startMenu["content"][startMenu["getIndex"]()]).
-		mainInit().
-	}
-	WAIT 0.
+	numpad["check"]().
 }
 CLEARSCREEN.
